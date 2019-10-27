@@ -1,0 +1,83 @@
+#include <iostream>
+#include <stdint.h>
+#include <stdio.h>
+#include <vector>
+using namespace std;
+using std::cout;
+using std::endl;
+
+int64_t cnt;
+
+void Merge(vector<int>& a, int first, int last) {
+    int middle = (first + last) / 2;
+    int size = last - first + 1;
+    int *zapas = nullptr;
+    zapas = new int [size];
+    int f0 = first;
+    int l0 = last;
+    int m0 = middle + 1;
+    for (int j = 0; j < size; j++) {
+        if (a[f0] <= a[m0]) {
+            zapas[j] = a[f0];
+            if (f0 != middle) {
+                f0++;
+            } else {
+                for (int i = j + 1; i < size; i++) {
+                    zapas[i] = a[first + i];
+                }
+                j = size;
+            }
+        } else {
+            zapas[j] = a[m0];
+            if (m0 - first > j) {
+                cnt = cnt + m0 - first - j;
+            }
+            if (m0 != last) {
+                m0++;
+            } else {
+                for (int i = j + 1; i < size; i++) {
+                    zapas[i] = a[first + i - last + middle];
+                }
+                j = size;
+            }
+        }
+    }
+    for (int j = first; j <= last; j++) {
+        a[j] = zapas[j - first];
+    }
+    delete[] zapas;
+    zapas = nullptr;
+}
+
+void Merge_down(vector<int>& a, int first, int last) {
+    if (first == last) {
+        return;
+    } else if (last - first == 1) {
+        if (a[last] < a[first]) {
+            cnt++;
+            swap(a[first], a[last]);
+        }
+        return;
+    } else {
+        int middle = (first + last) / 2;
+        Merge_down(a, first, middle);
+        Merge_down(a, middle + 1, last);
+        Merge(a, first, last);
+    }
+}
+
+int main()
+{
+    vector<int> massive;
+    cnt = 0;
+    int n = 0;
+    int x;
+    while (cin >> x) {
+        massive.push_back(x);
+        n++;
+    }
+    vector<int> aa;
+    Merge_down(massive, 0, n - 1);
+    printf("%ld", cnt);
+    return 0;
+}
